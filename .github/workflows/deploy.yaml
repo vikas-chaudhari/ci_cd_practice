@@ -1,4 +1,4 @@
-name: 🚀 Simple Deploy
+name: 🚀 Basic Deploy
 
 on:
   push:
@@ -20,11 +20,11 @@ jobs:
             mkdir -p ~/myapp
             cd ~/myapp
 
-            # Get latest code
-            git pull || git clone https://github.com/vikas-chaudhari/ci_cd_practice.git .
+            # Clean and get fresh code
+            rm -rf * .[^.]*
+            git clone https://github.com/vikas-chaudhari/ci_cd_practice.git .
 
-            # Install & restart
-            . ~/.nvm/nvm.sh
+            # Run with system Node
             npm install
             pkill -f "node index.js" || true
             nohup node index.js > app.log 2>&1 &
