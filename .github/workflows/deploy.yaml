@@ -25,7 +25,6 @@ jobs:
             mkdir -p ~/myapp && cd ~/myapp  # create directory if it doesn't exist
             git init
             git clone https://github.com/vikas-chaudhari/ci_cd_practice.git ~/myapp
-            git pull origin main           # pull latest code
             npm install                    # install/update dependencies
             pkill node || true             # stop existing Node app (if any)
             nohup node index.js > app.log 2>&1 &  # start Node app in background
