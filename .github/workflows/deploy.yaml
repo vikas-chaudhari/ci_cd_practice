@@ -22,10 +22,25 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            mkdir -p ~/myapp && cd ~/myapp  # create directory if it doesn't exist
-            git remote add origin https://github.com/vikas-chaudhari/ci_cd_practice.git
-            git pull origin main           # pull latest code
-            npm install                    # install/update dependencies
-            pkill node || true             # stop existing Node app (if any)
-            nohup node index.js > app.log 2>&1 &  # start Node app in background
+            # Optional: Install Node.js if not available
+            if ! command -v node &> /dev/null; then
+              echo "📦 Installing Node.js..."
+              curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+              sudo apt install -y nodejs
+            fi
+
+            # Reset deployment directory
+            rm -rf ~/myapp
+            git clone https://github.com/vikas-chaudhari/ci_cd_practice.git ~/myapp
+            cd ~/myapp
+
+            # Install dependencies
+            npm install
+
+            # Stop existing app
+            pkill node || true
+
+            # Start app in background
+            nohup node index.js > app.log 2>&1 &
+
             echo "🚀 Deployed successfully!"
