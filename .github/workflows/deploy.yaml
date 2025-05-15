@@ -1,30 +1,29 @@
-name: CI For Node App
+name: 🚀 Simple Node.js Deploy via SSH
 
 on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
-  build:
+  deploy:
+    name: 📦 Deploy to Remote Server
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - name: 📂 Checkout Code
+        uses: actions/checkout@v3
 
-      - name: ssh setup
-        run: |
-
-      - name: install Node.js
-        uses: actions/setup-node@v2
+      - name: 🔐 SSH to Server and Deploy
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          node-version: "18"
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run app
-        run: node index.js
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            mkdir -p ~/myapp && cd ~/myapp  # create directory if it doesn't exist
+            git pull origin main           # pull latest code
+            npm install                    # install/update dependencies
+            pkill node || true             # stop existing Node app (if any)
+            nohup node index.js > app.log 2>&1 &  # start Node app in background
