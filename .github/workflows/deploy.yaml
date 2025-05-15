@@ -24,7 +24,6 @@ jobs:
           script: |
             mkdir -p ~/myapp && cd ~/myapp  # create directory if it doesn't exist
             git init
-            rm -rf ~/myapp
             git clone https://github.com/vikas-chaudhari/ci_cd_practice.git ~/myapp
             git pull origin main           # pull latest code
             npm install                    # install/update dependencies
