@@ -27,3 +27,4 @@ jobs:
             npm install                    # install/update dependencies
             pkill node || true             # stop existing Node app (if any)
             nohup node index.js > app.log 2>&1 &  # start Node app in background
+            echo "🚀 Deployed successfully!"
