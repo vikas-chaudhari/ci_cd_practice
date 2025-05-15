@@ -1,43 +1,30 @@
-name: 🚀 Simple Node.js Deploy via SSH
+name: 🚀 Simple Deploy
 
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch: # Allow manual triggering
+    branches: [main]
+  workflow_dispatch:
 
 jobs:
   deploy:
-    name: 📦 Deploy to Remote Server
     runs-on: ubuntu-latest
-
     steps:
-      - name: 📂 Checkout Code
-        uses: actions/checkout@v4
-
-      - name: 🔐 SSH to Server and Deploy
+      - name: 🔐 Deploy
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT || 22 }}
           script: |
-            # Create app directory if needed
+            # Setup app directory
             mkdir -p ~/myapp
-
-            # Navigate to app directory
             cd ~/myapp
 
-            # Clone the repository (fresh copy)
-            rm -rf ./* || true
-            git clone https://github.com/vikas-chaudhari/ci_cd_practice.git .
+            # Get latest code
+            git pull || git clone https://github.com/vikas-chaudhari/ci_cd_practice.git .
 
-            # Install dependencies
-            npm ci
-
-            # Stop existing Node app and start new instance
-            pkill node || true
+            # Install & restart
+            . ~/.nvm/nvm.sh
+            npm install
+            pkill -f "node index.js" || true
             nohup node index.js > app.log 2>&1 &
-
-            echo "🚀 Deployed successfully!"
