@@ -1,4 +1,4 @@
-name: 🚀 Basic Deploy
+name: 🚀 Simple Deploy
 
 on:
   push:
@@ -20,11 +20,17 @@ jobs:
             mkdir -p ~/myapp
             cd ~/myapp
 
-            # Clean and get fresh code
-            rm -rf * .[^.]*
-            git clone https://github.com/vikas-chaudhari/ci_cd_practice.git .
+            # Get latest code
+            if [ -d ".git" ]; then
+              git pull
+            else
+              git clone https://github.com/vikas-chaudhari/ci_cd_practice.git .
+            fi
 
-            # Run with system Node
+            # Install dependencies
+            . ~/.nvm/nvm.sh
             npm install
+
+            # Restart the app
             pkill -f "node index.js" || true
-            nohup node index.js > app.log 2>&1 &
+            nohup node index.js > app.log 2>&1 &
