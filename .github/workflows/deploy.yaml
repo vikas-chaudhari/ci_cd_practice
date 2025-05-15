@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch: # Allow manual triggering
 
 jobs:
   deploy:
@@ -12,7 +13,7 @@ jobs:
 
     steps:
       - name: 📂 Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 🔐 SSH to Server and Deploy
         uses: appleboy/ssh-action@v1.0.3
@@ -20,12 +21,23 @@ jobs:
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
+          port: ${{ secrets.SSH_PORT || 22 }}
           script: |
-            mkdir -p ~/myapp && cd ~/myapp  # create directory if it doesn't exist
-            git init
-            git clone https://github.com/vikas-chaudhari/ci_cd_practice.git ~/myapp
-            npm install                    # install/update dependencies
-            pkill node || true             # stop existing Node app (if any)
-            nohup node index.js > app.log 2>&1 &  # start Node app in background
+            # Create app directory if needed
+            mkdir -p ~/myapp
+
+            # Navigate to app directory
+            cd ~/myapp
+
+            # Clone the repository (fresh copy)
+            rm -rf ./* || true
+            git clone https://github.com/vikas-chaudhari/ci_cd_practice.git .
+
+            # Install dependencies
+            npm ci
+
+            # Stop existing Node app and start new instance
+            pkill node || true
+            nohup node index.js > app.log 2>&1 &
+
             echo "🚀 Deployed successfully!"
